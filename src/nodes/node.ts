@@ -39,9 +39,7 @@ export async function node(
   }
 
   function handleProposal(k: number, x: Value) {
-    if (!proposals.has(k)) {
-      proposals.set(k, []);
-    }
+    !proposals.has(k) && proposals.set(k, []);
     proposals.get(k)!.push(x);
   
     if (proposals.get(k)!.length >= (N - F)) {
