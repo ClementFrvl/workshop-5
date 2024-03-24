@@ -1,7 +1,7 @@
 import bodyParser from "body-parser";
 import express from "express";
 import { BASE_NODE_PORT } from "../config";
-import { Value } from "../types";
+import { NodeState, Value } from "../types";
 
 export async function node(
   nodeId: number, // the ID of the node
@@ -16,9 +16,26 @@ export async function node(
   node.use(express.json());
   node.use(bodyParser.json());
 
-  // TODO implement this
-  // this route allows retrieving the current status of the node
-  // node.get("/status", (req, res) => {});
+  let state: NodeState = {
+    killed: false,
+    x: isFaulty ? null : initialValue,
+    decided: isFaulty ? null : false,
+    k: isFaulty ? null : 0,
+  };
+
+  node.get("/status", (req, res) => {
+    const {status, code} = isFaulty ? {status: "faulty", code: 500} : {status: "live", code: 200};
+    res.status(code).send(status);
+  });
+
+  node.get("/getState", (req, res) => {
+    res.status(200).send({
+      killed: state.killed,
+      x: state.x,
+      decided: state.decided,
+      k: state.k,
+    });
+  });
 
   // TODO implement this
   // this route allows the node to receive messages from other nodes
@@ -32,15 +49,11 @@ export async function node(
   // this route is used to stop the consensus algorithm
   // node.get("/stop", async (req, res) => {});
 
-  // TODO implement this
-  // get the current state of a node
-  // node.get("/getState", (req, res) => {});
-
   // start the server
   const server = node.listen(BASE_NODE_PORT + nodeId, async () => {
-    console.log(
-      `Node ${nodeId} is listening on port ${BASE_NODE_PORT + nodeId}`
-    );
+    // console.log(
+    //   `Node ${nodeId} is listening on port ${BASE_NODE_PORT + nodeId}`
+    // );
 
     // the node is ready
     setNodeIsReady(nodeId);
