@@ -91,7 +91,7 @@ export async function node(
     }
 
     !isFaulty && sendMessage(state.k ? 1 : 0, state.x ? initialValue : 0, "propose");
-    isFaulty ? res.status(500).send("The node is faulty.") : res.status(200).send("success");
+    isFaulty ? res.status(500).send("The node is faulty.") : res.status(200).send("Node started.");
   });
 
   node.get("/stop", async (req, res) => {
