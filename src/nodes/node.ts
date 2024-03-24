@@ -91,22 +91,13 @@ export async function node(
     while (!nodesAreReady()) {
       await delay(100);
     }
-    if (!isFaulty) {
-      state.x = initialValue;
-      state.decided = false;
-      state.k = 1;
 
-      sendMessage(state.k, state.x, "propose");
-      
-      res.status(200).send("success");
-    }
-    else {
-      state.killed = false,
-      state.decided = null;
-      state.x = null;
-      state.k = null;
-      res.status(500).send("The node is faulty.");
-    }
+    state.k = isFaulty ? null : 1;
+    state.x = isFaulty ? null : initialValue;
+    state.decided = isFaulty ? null : false;
+
+    !isFaulty && sendMessage(state.k ? 1 : 0, state.x ? initialValue : 0, "propose");
+    isFaulty ? res.status(500).send("The node is faulty.") : res.status(200).send("success");
   });
 
   node.get("/stop", async (req, res) => {
