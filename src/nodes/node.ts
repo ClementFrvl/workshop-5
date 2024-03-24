@@ -49,7 +49,6 @@ export async function node(
       const count1 = proposals.get(k)!.length - count0;
 
       const consensus = count0 > (N / 2) ? 0 : (count1 > (N / 2) ? 1 : "?");
-      
       sendMessage(k, consensus, "vote");
     }
   }
@@ -97,14 +96,12 @@ export async function node(
       state.k = 1;
 
       sendMessage(state.k, state.x, "propose");
-      
       res.status(200).send("success");
-    }
-    else {
+    } else {
       state.killed = false,
       state.decided = null;
       state.x = null;
-      state.k = null;
+      state.k = 0;
       res.status(500).send("The node is faulty.");
     }
   });
