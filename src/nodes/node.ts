@@ -39,7 +39,9 @@ export async function node(
   }
 
   function handleProposal(k: number, x: Value) {
-    !proposals.has(k) && proposals.set(k, []);
+    if (!proposals.has(k)) {
+      proposals.set(k, []);
+    }
     proposals.get(k)!.push(x);
   
     if (proposals.get(k)!.length >= (N - F)) {
@@ -47,6 +49,7 @@ export async function node(
       const count1 = proposals.get(k)!.length - count0;
 
       const consensus = count0 > (N / 2) ? 0 : (count1 > (N / 2) ? 1 : "?");
+      
       sendMessage(k, consensus, "vote");
     }
   }
@@ -94,12 +97,14 @@ export async function node(
       state.k = 1;
 
       sendMessage(state.k, state.x, "propose");
+      
       res.status(200).send("success");
-    } else {
+    }
+    else {
       state.killed = false,
       state.decided = null;
       state.x = null;
-      state.k = 0;
+      state.k = null;
       res.status(500).send("The node is faulty.");
     }
   });
